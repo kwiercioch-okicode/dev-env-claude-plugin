@@ -5,7 +5,7 @@ description: "Manage dev environments with git worktrees and infrastructure. Usa
 Run the dev-env CLI script:
 
 ```bash
-<this-plugin-dir>/scripts/dev-env.sh $ARGUMENTS
+<this-plugin-dir>/lib/dev-env.sh $ARGUMENTS
 ```
 
 If $ARGUMENTS is empty, default to `list`.

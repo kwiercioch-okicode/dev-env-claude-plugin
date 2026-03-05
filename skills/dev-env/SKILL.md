@@ -8,7 +8,7 @@ description: "Use when managing isolated dev environments - creating worktrees, 
 Run the CLI script and interpret its output:
 
 ```bash
-<plugin-dir>/scripts/dev-env.sh <action> [args]
+<plugin-dir>/lib/dev-env.sh <action> [args]
 ```
 
 Actions: `list`, `create <branch>`, `remove <name>`, `up <name>`, `down <name>`, `status <name>`, `switch <name|number>`

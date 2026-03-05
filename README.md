@@ -32,6 +32,7 @@ The plugin auto-detects project types:
 |------|----------------|
 | **Node.js / Bun** | Dev server on unique port per worktree |
 | **Next.js** | Next dev server with env overrides |
+| **SST** | `sst dev --stage <name>` per worktree |
 | **Docker Compose** | Isolated compose project per worktree |
 | **Multi-repo** | Worktrees across multiple repos + Docker + proxy |
 | **PHP** | Composer install + Docker/FPM container |

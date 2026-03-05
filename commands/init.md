@@ -22,6 +22,7 @@ Invoke the dev:dev-env skill to initialize a `.dev-env.yml` config for this proj
    | Files found | Detected type |
    |---|---|
    | `docker-compose.yml` + multiple repo subdirs with `.git` | Multi-repo (Docker + services) |
+   | `sst.config.ts` or `sst.config.js` | SST (Serverless Stack) |
    | `next.config.*` | Next.js |
    | `docker-compose.yml` + `Dockerfile` | Docker Compose app |
    | `bun.lock` or `bunfig.toml` | Bun project |
@@ -52,6 +53,13 @@ Invoke the dev:dev-env skill to initialize a `.dev-env.yml` config for this proj
    - Dev command (auto-detect from package.json scripts)
    - Port (auto-detect or default 3000)
    - Env file template (scan for .env.local, .env.dev, .env.example)
+
+   **SST:**
+   - Stage naming strategy: worktree name as stage (default) or custom prefix
+   - `sst dev` runs with `--stage <name>` per worktree
+   - No port management needed (Lambda runs in AWS)
+   - Ask about `.env` or `.env.<stage>` patterns
+   - Check for `sst.config.ts` to confirm app name
 
    **With subdomains:**
    - Domain pattern

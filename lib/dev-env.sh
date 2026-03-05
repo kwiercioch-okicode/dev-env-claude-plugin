@@ -68,6 +68,12 @@ read_config() {
   SCRIPT_UP=$(yaml_get_nested "scripts.up")
   SCRIPT_DOWN=$(yaml_get_nested "scripts.down")
   SCRIPT_STATUS=$(yaml_get_nested "scripts.status")
+
+  # Detect service types
+  SERVICE_TYPES=()
+  for svc_type in $(awk '/^  [a-z]/{key=$0; next} /type:/{if(key) print}' "$CONFIG" | sed 's/.*type:[[:space:]]*//'); do
+    SERVICE_TYPES+=("$svc_type")
+  done
 }
 
 # --- Colors ---
@@ -274,11 +280,56 @@ action_up() {
   if [ -n "$SCRIPT_UP" ]; then
     echo "Running: $SCRIPT_UP $name $*"
     cd "$PROJECT_ROOT" && $SCRIPT_UP "$name" "$@"
-  else
-    echo "No scripts.up defined in .dev-env.yml"
-    echo "Add a custom script or let Claude handle infrastructure setup."
-    exit 1
+    return
   fi
+
+  # Generic up: detect service command from config
+  local cmd=$(yaml_get_nested "services.app.command" 2>/dev/null)
+  [ -z "$cmd" ] && cmd=$(yaml_get_nested "services.frontend.command" 2>/dev/null)
+
+  if [ -z "$cmd" ]; then
+    echo "No scripts.up and no service command found in .dev-env.yml"
+    echo "NEEDS_CLAUDE=true"
+    return 1
+  fi
+
+  # Replace <name> placeholder with worktree name
+  cmd="${cmd//<name>/$name}"
+
+  local wt_path=""
+  if [ ${#REPOS[@]} -eq 1 ] && [ "${REPOS[0]}" = "." ]; then
+    wt_path="$PROJECT_ROOT/$WORKTREE_DIR/$name"
+  else
+    # Use first repo that has the worktree
+    for repo in "${REPOS[@]}"; do
+      [ -d "$PROJECT_ROOT/$repo/$WORKTREE_DIR/$name" ] && { wt_path="$PROJECT_ROOT/$repo/$WORKTREE_DIR/$name"; break; }
+    done
+  fi
+
+  if [ -z "$wt_path" ] || [ ! -d "$wt_path" ]; then
+    fail "Worktree not found for $name"
+    return 1
+  fi
+
+  # Setup logs
+  local logs_dir="$PROJECT_ROOT/logs/worktree"
+  mkdir -p "$logs_dir"
+  local log_file="$logs_dir/$name.log"
+  local pid_file="$logs_dir/$name.pid"
+
+  # Kill existing if running
+  if [ -f "$pid_file" ]; then
+    local old_pid=$(cat "$pid_file")
+    kill "$old_pid" 2>/dev/null && warn "Killed existing process $old_pid"
+    rm -f "$pid_file"
+  fi
+
+  echo "Starting: $cmd"
+  echo "  in: $wt_path"
+  cd "$wt_path" && $cmd > "$log_file" 2>&1 &
+  local pid=$!
+  echo "$pid" > "$pid_file"
+  ok "Started (PID: $pid, log: $log_file)"
 }
 
 action_down() {
@@ -288,9 +339,25 @@ action_down() {
   if [ -n "$SCRIPT_DOWN" ]; then
     echo "Running: $SCRIPT_DOWN $name"
     cd "$PROJECT_ROOT" && $SCRIPT_DOWN "$name"
+    return
+  fi
+
+  # Generic down: kill by PID file
+  local pid_file="$PROJECT_ROOT/logs/worktree/$name.pid"
+  if [ -f "$pid_file" ]; then
+    local pid=$(cat "$pid_file")
+    if kill -0 "$pid" 2>/dev/null; then
+      kill "$pid" 2>/dev/null
+      sleep 1
+      kill -0 "$pid" 2>/dev/null && kill -9 "$pid" 2>/dev/null
+      ok "Stopped process $pid"
+    else
+      warn "Process $pid already dead"
+    fi
+    rm -f "$pid_file"
+    rm -f "$PROJECT_ROOT/logs/worktree/$name.log"
   else
-    echo "No scripts.down defined in .dev-env.yml"
-    exit 1
+    warn "No PID file found for $name"
   fi
 }
 
@@ -326,6 +393,26 @@ action_status() {
           fail "Port $port: not listening"
         fi
       done
+    fi
+
+    # Check PID file
+    local pid_file="$PROJECT_ROOT/logs/worktree/$name.pid"
+    if [ -f "$pid_file" ]; then
+      local pid=$(cat "$pid_file")
+      echo ""
+      if kill -0 "$pid" 2>/dev/null; then
+        ok "Process running (PID: $pid)"
+      else
+        fail "Process dead (PID: $pid)"
+      fi
+    fi
+
+    # Show last log lines
+    local log_file="$PROJECT_ROOT/logs/worktree/$name.log"
+    if [ -f "$log_file" ]; then
+      echo ""
+      echo "Last 5 log lines:"
+      tail -5 "$log_file" | sed 's/^/  /'
     fi
   fi
 }

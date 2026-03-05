@@ -1,0 +1,19 @@
+{
+  "name": "dev-env",
+  "owner": {
+    "name": "Kris Wiercioch",
+    "email": "kris@kwiercioch.com"
+  },
+  "metadata": {
+    "description": "Dev environment management with git worktrees for Claude Code",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "dev-env",
+      "source": "./",
+      "description": "Manage isolated dev environments using git worktrees. Auto-detects project type (Docker, Next.js, Node, Bun, PHP) and handles infrastructure lifecycle.",
+      "version": "0.1.0"
+    }
+  ]
+}

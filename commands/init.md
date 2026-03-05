@@ -1,8 +1,8 @@
 ---
-description: "Initialize dev environment config for a project. Usage: /dev-init [path]"
+description: "Initialize dev environment config for a project. Usage: /dev:init [path]"
 ---
 
-Initialize a `.dev-env.yml` configuration file for this project. This config tells `/dev` how to manage worktrees and infrastructure.
+Invoke the dev:dev-env skill to initialize a `.dev-env.yml` config for this project. This config tells `/dev:env` how to manage worktrees and infrastructure.
 
 <UserRequest>
   $ARGUMENTS
@@ -69,6 +69,6 @@ Initialize a `.dev-env.yml` configuration file for this project. This config tel
    Type: <detected-type>
    Services: <list>
 
-   Use /dev create <branch> to create a dev environment
-   Use /dev list to see all environments
+   Use /dev:env create <branch> to create a dev environment
+   Use /dev:env list to see all environments
    ```

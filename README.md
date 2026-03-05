@@ -4,35 +4,27 @@ Manage isolated dev environments using git worktrees. Each environment gets its 
 
 ## Installation
 
-### Via Superpowers Marketplace
-
 ```bash
-/plugins marketplace add kwiercioch/dev-env-claude-plugin
-/plugins install dev-env@dev-env
-```
-
-### Direct
-
-```bash
-/plugins install-from-repo kwiercioch/dev-env-claude-plugin
+/plugin marketplace add kwiercioch-okicode/dev-env-claude-plugin
+/plugin install dev@dev-env
 ```
 
 ## Quick Start
 
 ```bash
-/dev-init                    # configure for your project (one-time)
-/dev create feature/my-feat  # create worktree + start infra
-/dev                         # list all environments with status
-/dev status my-feat          # detailed status
-/dev down my-feat            # stop infra (keep worktree)
-/dev up my-feat              # restart infra
-/dev remove my-feat          # stop infra + remove worktree
+/dev:init                          # configure for your project (one-time)
+/dev:env create feature/my-feat    # create worktree + start infra
+/dev:env                           # list all environments with status
+/dev:env status my-feat            # detailed status
+/dev:env down my-feat              # stop infra (keep worktree)
+/dev:env up my-feat                # restart infra
+/dev:env remove my-feat            # stop infra + remove worktree
 ```
 
 ## How It Works
 
-1. **`/dev-init`** scans your project and generates `.dev-env.yml` - a config file that describes your dev stack
-2. **`/dev`** reads that config to manage worktrees and infrastructure
+1. **`/dev:init`** scans your project and generates `.dev-env.yml` - a config file that describes your dev stack
+2. **`/dev:env`** reads that config to manage worktrees and infrastructure
 
 The plugin auto-detects project types:
 
@@ -110,14 +102,14 @@ dns:
 
 | Command | Description |
 |---------|-------------|
-| `/dev-init [path]` | Initialize config for a project |
-| `/dev` or `/dev list` | List environments with infra status |
-| `/dev create <branch>` | Create worktree + start infrastructure |
-| `/dev remove <name>` | Stop infra + remove worktree (with safety checks) |
-| `/dev switch <name\|number>` | Switch main checkout to a branch |
-| `/dev up <name>` | Start infrastructure for existing worktree |
-| `/dev down <name>` | Stop infrastructure (keep worktree) |
-| `/dev status <name>` | Detailed status of one environment |
+| `/dev:init [path]` | Initialize config for a project |
+| `/dev:env` or `/dev:env list` | List environments with infra status |
+| `/dev:env create <branch>` | Create worktree + start infrastructure |
+| `/dev:env remove <name>` | Stop infra + remove worktree (with safety checks) |
+| `/dev:env switch <name\|number>` | Switch main checkout to a branch |
+| `/dev:env up <name>` | Start infrastructure for existing worktree |
+| `/dev:env down <name>` | Stop infrastructure (keep worktree) |
+| `/dev:env status <name>` | Detailed status of one environment |
 
 ## Custom Scripts
 

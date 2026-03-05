@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Dev environment management with git worktrees for Claude Code",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "plugins": [
     {
       "name": "dev",
       "source": "./",
       "description": "Manage isolated dev environments using git worktrees. Auto-detects project type (Docker, Next.js, Node, Bun, PHP) and handles infrastructure lifecycle.",
-      "version": "0.2.0"
+      "version": "0.3.0"
     }
   ]
 }
